@@ -1,0 +1,7 @@
+apiVersion: v2
+name: telegram-intregation
+description: Telegram Bot integration microservice (Grammy-based)
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords: [telegram, bot, messaging, microservice]

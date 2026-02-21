@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "telegram-intregation.fullname" . }}
+  labels: {{- include "telegram-intregation.labels" . | nindent 4 }}
+data:
+  PORT: {{ .Values.env.PORT | quote }}
+  LOG_LEVEL: {{ .Values.env.LOG_LEVEL | quote }}
+  NODE_ENV: {{ .Values.env.NODE_ENV | quote }}
+  BOT_MODE: {{ .Values.env.BOT_MODE | quote }}

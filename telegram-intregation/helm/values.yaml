@@ -1,0 +1,82 @@
+replicaCount: 1
+
+image:
+  repository: telegram-intregation
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 3001
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: telegram-api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+env:
+  PORT: "3001"
+  LOG_LEVEL: "info"
+  NODE_ENV: "production"
+  BOT_MODE: "polling"
+
+# Secrets — override these in prod with --set or a sealed secrets operator
+secret:
+  apiKey: "change-me-strong-secret-key"
+  botToken: "your-bot-token-here"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3001
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 3001
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 1001
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1001
+  capabilities:
+    drop: [ALL]
+
+terminationGracePeriodSeconds: 30
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podAnnotations: {}
+serviceAccount:
+  create: false
+  name: ""
