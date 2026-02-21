@@ -1,0 +1,12 @@
+apiVersion: v2
+name: whatsapp-intregation
+description: WhatsApp Web integration microservice (Baileys-based)
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - whatsapp
+  - messaging
+  - microservice
+maintainers:
+  - name: bimalrai

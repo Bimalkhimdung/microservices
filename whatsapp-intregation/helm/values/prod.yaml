@@ -1,0 +1,38 @@
+# Production environment overrides
+replicaCount: 1  # MUST stay at 1 for WhatsApp Web
+
+image:
+  tag: ""  # Set via CI/CD: --set image.tag=$VERSION
+  pullPolicy: IfNotPresent
+
+env:
+  LOG_LEVEL: "info"
+  NODE_ENV: "production"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+  hosts:
+    - host: whatsapp-api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: whatsapp-tls
+      hosts:
+        - whatsapp-api.example.com
+
+persistence:
+  storageClass: "standard"
+  size: 2Gi

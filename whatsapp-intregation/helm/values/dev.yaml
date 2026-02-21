@@ -1,0 +1,24 @@
+# Dev environment overrides
+replicaCount: 1
+
+image:
+  tag: latest
+  pullPolicy: Always
+
+env:
+  LOG_LEVEL: "debug"
+  NODE_ENV: "development"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+ingress:
+  enabled: false
+
+persistence:
+  size: 512Mi

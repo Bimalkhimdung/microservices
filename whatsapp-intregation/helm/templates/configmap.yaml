@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "whatsapp-intregation.fullname" . }}
+  labels:
+    {{- include "whatsapp-intregation.labels" . | nindent 4 }}
+data:
+  PORT: {{ .Values.env.PORT | quote }}
+  AUTH_DIR: {{ .Values.env.AUTH_DIR | quote }}
+  LOG_LEVEL: {{ .Values.env.LOG_LEVEL | quote }}
+  NODE_ENV: {{ .Values.env.NODE_ENV | quote }}

@@ -1,0 +1,32 @@
+{
+  "name": "whatsapp-intregation",
+  "version": "1.0.0",
+  "description": "Production-ready WhatsApp Web integration microservice using Baileys",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "lint": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.16",
+    "fastify": "^4.27.0",
+    "@fastify/cors": "^9.0.1",
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2",
+    "qrcode": "^1.5.4",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/qrcode": "^1.5.5",
+    "typescript": "^5.5.2",
+    "tsx": "^4.15.5"
+  }
+}

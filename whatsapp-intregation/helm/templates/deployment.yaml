@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "whatsapp-intregation.fullname" . }}
+  labels:
+    {{- include "whatsapp-intregation.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  # IMPORTANT: Recreate strategy required — WhatsApp Web can only have 1 active socket
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "whatsapp-intregation.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        # Force pod restart on Secret/ConfigMap changes
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "whatsapp-intregation.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: whatsapp
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "whatsapp-intregation.fullname" . }}
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "whatsapp-intregation.fullname" . }}
+                  key: api-key
+          volumeMounts:
+            {{- if .Values.persistence.enabled }}
+            - name: wa-auth
+              mountPath: {{ .Values.persistence.mountPath }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: wa-auth
+          persistentVolumeClaim:
+            claimName: {{ include "whatsapp-intregation.fullname" . }}-auth
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  whatsapp-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: whatsapp-intregation:local
+    container_name: whatsapp-intregation
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      API_KEY: ${API_KEY:-change-me-strong-secret}
+      AUTH_DIR: /data/wa-auth
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NODE_ENV: ${NODE_ENV:-development}
+    volumes:
+      # Persist WhatsApp session credentials across restarts
+      - wa-auth-data:/data/wa-auth
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  wa-auth-data:
+    driver: local

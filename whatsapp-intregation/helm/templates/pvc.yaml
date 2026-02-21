@@ -1,0 +1,20 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "whatsapp-intregation.fullname" . }}-auth
+  labels:
+    {{- include "whatsapp-intregation.labels" . | nindent 4 }}
+  annotations:
+    # Retain PVC on helm delete to preserve WhatsApp credentials
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - {{ .Values.persistence.accessMode | quote }}
+  {{- if .Values.persistence.storageClass }}
+  storageClassName: {{ .Values.persistence.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+{{- end }}
